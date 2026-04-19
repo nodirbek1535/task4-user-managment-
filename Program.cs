@@ -1,24 +1,47 @@
+using Microsoft.EntityFrameworkCore;
 using task4_user_managment_.Brokers.Loggings;
+using task4_user_managment_.Brokers.Security;
+using task4_user_managment_.Brokers.Storages;
+using task4_user_managment_.Services.Foundations.Security;
+using task4_user_managment_.Services.Foundations.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Brokers
 builder.Services.AddTransient<ILoggingBroker, LoggingBroker>();
-// Add services to the container.
 
+builder.Services.AddScoped<IRandomBroker, RandomBroker>();
+builder.Services.AddScoped<IHashBroker, HashBroker>();
+
+// Services
+builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
+builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IUserService, UserService>();
+
+// Database
+builder.Services.AddDbContext<StorageBroker>(options =>
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IStorageBroker, StorageBroker>();
+
+// Controllers
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Swagger ✅
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Swagger middleware ✅
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
 
 app.MapControllers();
