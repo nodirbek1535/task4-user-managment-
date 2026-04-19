@@ -1,0 +1,6 @@
+@task4_user_managment__HostAddress = http://localhost:5053
+
+GET {{task4_user_managment__HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
