@@ -7,33 +7,43 @@ using task4_user_managment_.Services.Foundations.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Brokers
 builder.Services.AddTransient<ILoggingBroker, LoggingBroker>();
 
 builder.Services.AddScoped<IRandomBroker, RandomBroker>();
 builder.Services.AddScoped<IHashBroker, HashBroker>();
 
+// Services
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
-
 builder.Services.AddScoped<IUserService, UserService>();
 
+// Database
 builder.Services.AddDbContext<StorageBroker>(options =>
     options.UseNpgsql(
         builder.Configuration.GetConnectionString("DefaultConnection")));
+
 builder.Services.AddScoped<IStorageBroker, StorageBroker>();
 
+// Controllers
 builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+
+// Swagger ✅
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
+// Swagger middleware ✅
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+
 app.MapControllers();
 
 app.Run();

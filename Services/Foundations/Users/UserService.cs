@@ -2,45 +2,52 @@
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
+using task4_user_managment_.Brokers.Loggings;
 using task4_user_managment_.Brokers.Storages;
 using task4_user_managment_.Services.Foundations.Security;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Services.Foundations.Users
 {
-    public class UserService : IUserService
+    public partial class UserService : IUserService
     {
         private readonly IStorageBroker storageBroker;
+        private readonly ILoggingBroker loggingBroker;
         private readonly IPasswordHashService passwordHashService;
         private readonly ITokenService tokenService;
 
         public UserService(
             IStorageBroker storageBroker,
+            ILoggingBroker loggingBroker,
             IPasswordHashService passwordHashService,
             ITokenService tokenService)
         {
             this.storageBroker = storageBroker;
+            this.loggingBroker = loggingBroker;
             this.passwordHashService = passwordHashService;
             this.tokenService = tokenService;
         }
 
-        public async ValueTask<User> AddUserAsync(User user)
-        {
-            user.Id = Guid.NewGuid();
+        public ValueTask<User> AddUserAsync(User user) =>
+            TryCatch(async () =>
+            {
+                ValidateUserOnAdd(user);
 
-            user.PasswordHash =
-                this.passwordHashService.HashPassword(user.PasswordHash);
+                user.Id = Guid.NewGuid();
 
-            user.TokenExpiresAt =
-                this.tokenService.GetTokenExpirationTime();
+                user.PasswordHash =
+                    this.passwordHashService.HashPassword(user.PasswordHash);
 
-            user.Status = UserStatus.Unverified;
+                user.TokenExpiresAt =
+                    this.tokenService.GetTokenExpirationTime();
 
-            user.CreatedDate = DateTime.UtcNow;
-            user.UpdatedDate = DateTime.UtcNow;
-            user.RegistrationTime = DateTime.UtcNow;
+                user.Status = UserStatus.Unverified;
 
-            return await this.storageBroker.InsertUserAsync(user);
-        }
+                user.CreatedDate = DateTime.UtcNow;
+                user.UpdatedDate = DateTime.UtcNow;
+                user.RegistrationTime = DateTime.UtcNow;
+
+                return await this.storageBroker.InsertUserAsync(user);
+            });
     }
 }
