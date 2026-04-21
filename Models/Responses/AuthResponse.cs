@@ -4,7 +4,7 @@
 
 using task4_user_managment_.Models.Responses;
 
-namespace task4_user_managment_.Models.Responces
+namespace task4_user_managment_.Models.Responses
 {
     public class AuthResponse
     {
