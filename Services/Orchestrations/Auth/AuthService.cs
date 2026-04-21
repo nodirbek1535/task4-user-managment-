@@ -42,6 +42,7 @@ namespace task4_user_managment_.Services.Orchestrations.Auth
             };
         }
 
+
         public ValueTask<AuthResponse> LoginAsync(LoginRequest request)
         {
             throw new NotImplementedException();

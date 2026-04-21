@@ -14,7 +14,6 @@ namespace task4_user_managment_.Services.Foundations.Users
             ValidateUserNotNull(user);
 
             Validate(
-                (Rule: IsInvalid(user.Id), Parameter: nameof(User.Id)),
                 (Rule: IsInvalid(user.Name), Parameter: nameof(User.Name)),
                 (Rule: IsInvalid(user.Email), Parameter: nameof(User.Email)),
                 (Rule: IsInvalid(user.PasswordHash), Parameter: nameof(User.PasswordHash))

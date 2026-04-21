@@ -4,6 +4,7 @@ using task4_user_managment_.Brokers.Security;
 using task4_user_managment_.Brokers.Storages;
 using task4_user_managment_.Services.Foundations.Security;
 using task4_user_managment_.Services.Foundations.Users;
+using task4_user_managment_.Services.Orchestrations.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IHashBroker, HashBroker>();
 builder.Services.AddScoped<IPasswordHashService, PasswordHashService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
 
 // Database
 builder.Services.AddDbContext<StorageBroker>(options =>
