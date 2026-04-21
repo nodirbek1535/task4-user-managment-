@@ -4,12 +4,12 @@
 
 using Xeptions;
 
-namespace task4_user_managment_.Models.Users.Exceptions
+namespace task4_user_managment_.Models.Exceptions
 {
-    public class NotFoundUserException:Xeption
+    public class InvalidUserException:Xeption
     {
-        public NotFoundUserException(Guid userId)
-            : base(message: $"Couldn't find user with id: {userId}.")
+        public InvalidUserException()
+            : base("Invalid user. Please correct the errors and try again.")
         { }
     }
 }

@@ -4,7 +4,7 @@
 
 using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
-using task4_user_managment_.Models.Users.Exceptions;
+using task4_user_managment_.Models.Exceptions;
 using task4_user_managment_.Services.Foundations.Users;
 using UserManagement.Core.Models.Users;
 

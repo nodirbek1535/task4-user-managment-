@@ -4,7 +4,7 @@
 
 using Xeptions;
 
-namespace task4_user_managment_.Models.Users.Exceptions
+namespace task4_user_managment_.Models.Exceptions
 {
     public class FailedUserStorageException:Xeption
     {

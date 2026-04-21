@@ -2,7 +2,7 @@
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using task4_user_managment_.Models.Users.Exceptions;
+using task4_user_managment_.Models.Exceptions;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Services.Foundations.Users

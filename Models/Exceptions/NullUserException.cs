@@ -4,12 +4,12 @@
 
 using Xeptions;
 
-namespace task4_user_managment_.Models.Users.Exceptions
+namespace task4_user_managment_.Models.Exceptions
 {
-    public class InvalidUserException:Xeption
+    public class NullUserException:Xeption
     {
-        public InvalidUserException()
-            : base("Invalid user. Please correct the errors and try again.")
+        public NullUserException() 
+            : base("User is null.")
         { }
     }
 }
