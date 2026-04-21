@@ -5,10 +5,9 @@
 using EFxceptions.Models.Exceptions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using task4_user_managment_.Models.Users.Exceptions;
+using task4_user_managment_.Models.Exceptions;
 using UserManagement.Core.Models.Users;
 using Xeptions;
-using static System.Collections.Specialized.BitVector32;
 
 namespace task4_user_managment_.Services.Foundations.Users
 {

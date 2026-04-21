@@ -2,7 +2,7 @@
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using task4_user_managment_.Models.Users.Exceptions;
+using task4_user_managment_.Models.Exceptions;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Services.Foundations.Users
@@ -14,7 +14,6 @@ namespace task4_user_managment_.Services.Foundations.Users
             ValidateUserNotNull(user);
 
             Validate(
-                (Rule: IsInvalid(user.Id), Parameter: nameof(User.Id)),
                 (Rule: IsInvalid(user.Name), Parameter: nameof(User.Name)),
                 (Rule: IsInvalid(user.Email), Parameter: nameof(User.Email)),
                 (Rule: IsInvalid(user.PasswordHash), Parameter: nameof(User.PasswordHash))
