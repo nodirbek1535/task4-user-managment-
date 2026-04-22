@@ -75,5 +75,25 @@ namespace task4_user_managment_.Controllers
                 return InternalServerError(serviceException.InnerException);
             }
         }
+
+        [HttpGet]
+        public ActionResult<IQueryable<User>> GetAllUsers()
+        {
+            try
+            {
+                IQueryable<User> allUsers =
+                    this.userService.GetAllUsers();
+
+                return Ok(allUsers);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+        }
     }
 }
