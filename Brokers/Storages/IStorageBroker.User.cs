@@ -9,5 +9,6 @@ namespace task4_user_managment_.Brokers.Storages
     public partial interface IStorageBroker
     {
         ValueTask<User> InsertUserAsync(User user);
+        ValueTask<User> SelectUserByIdAsync(Guid userId);   
     }
 }

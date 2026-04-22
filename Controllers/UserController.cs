@@ -46,5 +46,34 @@ namespace task4_user_managment_.Controllers
                 return InternalServerError(serviceException.InnerException);
             }
         }
+
+        [HttpGet("{userId:guid}")]
+        public async ValueTask<ActionResult> GetUserByIdAsync(Guid userId)
+        {
+            try
+            {
+                User retrievedUser =
+                    await this.userService.RetrieveUserByAsync(userId);
+
+                return Ok(retrievedUser);
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyValidationException dependencyValidationException)
+                when (dependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(dependencyValidationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+        }
     }
 }

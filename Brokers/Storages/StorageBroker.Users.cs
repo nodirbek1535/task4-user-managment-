@@ -18,5 +18,9 @@ namespace task4_user_managment_.Brokers.Storages
 
             return entity.Entity;
         }
+
+        public async ValueTask<User> SelectUserByIdAsync(Guid userId) =>
+            await this.Users.
+                FirstOrDefaultAsync(user => user.Id == userId);
     }
 }

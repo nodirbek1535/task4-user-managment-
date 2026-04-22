@@ -49,5 +49,15 @@ namespace task4_user_managment_.Services.Foundations.Users
 
                 return await this.storageBroker.InsertUserAsync(user);
             });
+
+        public ValueTask<User> RetrieveUserByAsync(Guid userId) =>
+            TryCatch(async () =>
+            {
+                ValidateUserId(userId);
+                User maybeUser = await this.storageBroker.SelectUserByIdAsync(userId);
+                ValidateUserStorage(maybeUser, userId);
+
+                return maybeUser!;
+            });
     }
 }

@@ -26,6 +26,19 @@ namespace task4_user_managment_.Services.Foundations.Users
                 throw new NullUserException();
         }
 
+        private void ValidateUserId(Guid userId)
+        {
+            Validate(
+                (Rule: IsInvalid(userId), Parameter: nameof(User.Id))
+            );
+        }
+
+        private void ValidateUserStorage(User maybeUser, Guid userId)
+        {
+            if (maybeUser is null)
+                throw new NotFoundUserException(userId);
+        }
+
         private static dynamic IsInvalid(Guid id) => new
         {
             Condition = id == Guid.Empty,
