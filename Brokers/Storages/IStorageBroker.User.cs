@@ -10,5 +10,6 @@ namespace task4_user_managment_.Brokers.Storages
     {
         ValueTask<User> InsertUserAsync(User user);
         ValueTask<User> SelectUserByIdAsync(Guid userId);   
+        IQueryable<User> SelectAllUsers();
     }
 }

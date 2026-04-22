@@ -2,8 +2,10 @@
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
+using Microsoft.Data.SqlClient;
 using task4_user_managment_.Brokers.Loggings;
 using task4_user_managment_.Brokers.Storages;
+using task4_user_managment_.Models.Exceptions;
 using task4_user_managment_.Services.Foundations.Security;
 using UserManagement.Core.Models.Users;
 
@@ -59,5 +61,29 @@ namespace task4_user_managment_.Services.Foundations.Users
 
                 return maybeUser!;
             });
+
+        public IQueryable<User> GetAllUsers()
+        {
+            try
+            {
+                return this.storageBroker.SelectAllUsers();
+            }
+            catch(SqlException sqlException)
+            {
+                var failedUserStorageException =
+                    new FailedUserStorageException(sqlException);
+
+                this.loggingBroker.LogError(sqlException);
+
+                throw new UserDependencyException(failedUserStorageException);
+            }
+            catch(Exception ex)
+            {
+                var failedUserServiceException =
+                    new FailedUserServiceException(ex);
+
+                throw new UserServiceException(failedUserServiceException);
+            }
+        }
     }
 }

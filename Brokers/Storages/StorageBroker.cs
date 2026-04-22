@@ -15,6 +15,8 @@ namespace task4_user_managment_.Brokers.Storages
         public StorageBroker(IConfiguration configuration) =>
             this.configuration = configuration;
 
+        protected IQueryable<T> SelectAll<T>() where T : class => this.Set<T>();
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder.ConfigureWarnings(w =>
