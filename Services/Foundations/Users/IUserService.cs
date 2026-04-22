@@ -10,5 +10,6 @@ namespace task4_user_managment_.Services.Foundations.Users
     {
         ValueTask<User> AddUserAsync(User user);
         ValueTask<User> RetrieveUserByAsync(Guid userId);
+        IQueryable<User> GetAllUsers();
     }
 }
