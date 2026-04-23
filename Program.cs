@@ -11,6 +11,7 @@ using task4_user_managment_.Services.Foundations.Emails;
 using task4_user_managment_.Services.Foundations.Security;
 using task4_user_managment_.Services.Foundations.Users;
 using task4_user_managment_.Services.Orchestrations.Auth;
+using task4_user_managment_.Services.Processings.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserProcessingService, UserProcessingService>();
 
 // Database
 builder.Services.AddDbContext<StorageBroker>(options =>

@@ -1,4 +1,4 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
 using task4_user_managment_.Models.Exceptions;
 using task4_user_managment_.Services.Foundations.Users;
+using task4_user_managment_.Services.Processings.Users;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Controllers
@@ -15,8 +16,15 @@ namespace task4_user_managment_.Controllers
     public class UserController : RESTFulController
     {
         private readonly IUserService userService;
-        public UserController(IUserService userService) =>
+        private readonly IUserProcessingService userProcessingService;
+
+        public UserController(
+            IUserService userService,
+            IUserProcessingService userProcessingService)
+        {
             this.userService = userService;
+            this.userProcessingService = userProcessingService;
+        }
 
         [HttpPost]
         public async ValueTask<ActionResult> PostUserAsync(User user)
@@ -155,6 +163,72 @@ namespace task4_user_managment_.Controllers
             catch (UserServiceException userServiceException)
             {
                 return InternalServerError(userServiceException.InnerException);
+            }
+        }
+
+        [HttpPatch("block")]
+        public async ValueTask<IActionResult> BlockUsersAsync([FromBody] List<Guid> userIds)
+        {
+            try
+            {
+                await this.userProcessingService.BlockUsersAsync(userIds);
+                return Ok("Users blocked successfully.");
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+        }
+
+        [HttpPatch("unblock")]
+        public async ValueTask<IActionResult> UnblockUsersAsync([FromBody] List<Guid> userIds)
+        {
+            try
+            {
+                await this.userProcessingService.UnblockUsersAsync(userIds);
+                return Ok("Users unblocked successfully.");
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+        }
+
+        [HttpDelete("bulk")]
+        public async ValueTask<IActionResult> DeleteUsersAsync([FromBody] List<Guid> userIds)
+        {
+            try
+            {
+                await this.userProcessingService.DeleteUsersAsync(userIds);
+                return Ok("Users deleted successfully.");
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
             }
         }
     }
