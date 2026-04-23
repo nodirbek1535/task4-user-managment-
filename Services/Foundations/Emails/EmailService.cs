@@ -2,6 +2,7 @@
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
+using System.Net;
 using task4_user_managment_.Brokers.Emails;
 
 namespace task4_user_managment_.Services.Foundations.Emails
@@ -15,7 +16,9 @@ namespace task4_user_managment_.Services.Foundations.Emails
 
         public async ValueTask SendVerificationEmailAsync(string userEmail, string name, string token)
         {
-            string verificationLink = $"https://localhost7049/api/user/confirm?token={token}";
+            string encodedToken = WebUtility.UrlEncode(token);
+
+            string verificationLink = $"https://localhost:7186/api/auth/confirm-email?token={encodedToken}";
 
             string subject = "Please verify your email";
 

@@ -29,6 +29,20 @@ namespace task4_user_managment_.Controllers
             return Ok(response);
         }
 
+        [HttpGet("confirm-email")]
+        public async ValueTask<ActionResult<string>> ConfirmEmailAsync([FromQuery] string token)
+        {
+            bool isConfirmed = await this.authService.ConfirmEmailAsync(token);
+
+            if (isConfirmed)
+            {
+                return Ok("Emailingiz muvaffaqiyatli tasdiqlandi! Endi login qilishingiz mumkin.");
+            }
+
+            return BadRequest("Token yaroqsiz yoki muddati o'tgan.");
+        }
+
+
         //login user
         [HttpPost("login")]
         public async ValueTask<IActionResult> LoginAsync(LoginRequest request)
