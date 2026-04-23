@@ -13,5 +13,6 @@ namespace task4_user_managment_.Brokers.Storages
         IQueryable<User> SelectAllUsers();
         ValueTask<User> UpdateUserAsync(User user);
         ValueTask<User> DeleteUserAsync(User user);
+        ValueTask<User> SelectUserByTokenAsync(string token);
     }
 }

@@ -47,5 +47,9 @@ namespace task4_user_managment_.Brokers.Storages
 
             return user;
         }
+
+        public async ValueTask<User> SelectUserByTokenAsync(string token) =>
+            await this.Users.FirstOrDefaultAsync(
+                user => user.EmailConfirmationToken == token);
     }
 }

@@ -40,11 +40,13 @@ namespace task4_user_managment_.Services.Foundations.Users
                 user.PasswordHash =
                     this.passwordHashService.HashPassword(user.PasswordHash);
 
+                user.EmailConfirmationToken =
+                    this.tokenService.GenerateEmailConfirmationToken();
+
                 user.TokenExpiresAt =
                     this.tokenService.GetTokenExpirationTime();
 
                 user.Status = UserStatus.Unverified;
-
                 user.CreatedDate = DateTime.UtcNow;
                 user.UpdatedDate = DateTime.UtcNow;
                 user.RegistrationTime = DateTime.UtcNow;
@@ -111,6 +113,17 @@ namespace task4_user_managment_.Services.Foundations.Users
                 ValidateUserStorage(maybeUser, userId);
 
                 return await this.storageBroker.DeleteUserAsync(maybeUser);
+            });
+
+        public ValueTask<User> RetrieveUserByTokenAsync(string token) =>
+            TryCatch(async () =>
+            {
+                User maybeUser =
+                    await this.storageBroker.SelectUserByTokenAsync(token);
+
+                ValidateUserStorage(maybeUser, Guid.Empty);
+
+                return maybeUser!;
             });
     }
 }

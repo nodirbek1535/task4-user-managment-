@@ -5,6 +5,7 @@
 using EFxceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Brokers.Storages
 {
@@ -27,6 +28,15 @@ namespace task4_user_managment_.Brokers.Storages
                 ?? throw new InvalidOperationException("Connection string not found");
 
             optionsBuilder.UseNpgsql(connectionString);
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
         }
     }
 }

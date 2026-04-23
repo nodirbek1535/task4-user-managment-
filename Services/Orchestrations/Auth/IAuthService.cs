@@ -11,5 +11,6 @@ namespace task4_user_managment_.Services.Orchestrations.Auth
     {
         ValueTask<UserResponse> RegisterAsync(RegisterRequest request);
         ValueTask<AuthResponse> LoginAsync(LoginRequest request);
+        ValueTask<bool> ConfirmEmailAsync(string token);
     }
 }
