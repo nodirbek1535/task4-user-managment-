@@ -15,19 +15,14 @@ using task4_user_managment_.Services.Processings.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// CORS — React frontend uchun
+// CORS
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins(
-            "http://localhost:5173",
-            "http://localhost:3000",
-            "https://localhost:5173"
-        )
-        .AllowAnyHeader()
-        .AllowAnyMethod()
-        .AllowCredentials();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
