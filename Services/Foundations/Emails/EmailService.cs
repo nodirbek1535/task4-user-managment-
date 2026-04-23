@@ -1,4 +1,4 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
@@ -18,7 +18,7 @@ namespace task4_user_managment_.Services.Foundations.Emails
         {
             string encodedToken = WebUtility.UrlEncode(token);
 
-            string verificationLink = $"https://localhost:7186/api/auth/confirm-email?token={encodedToken}";
+            string verificationLink = $"https://nasrullayevnodirbek-cxg2ehbhcte9a7a4.canadacentral-01.azurewebsites.net/api/auth/confirm-email?token={encodedToken}";
 
             string subject = "Please verify your email";
 
