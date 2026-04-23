@@ -22,6 +22,7 @@ namespace task4_user_managment_.Brokers.Storages
 
         public async ValueTask<User> SelectUserByIdAsync(Guid userId) =>
             await this.Users.
+                AsNoTracking().
                 FirstOrDefaultAsync(user => user.Id == userId);
 
         public IQueryable<User> SelectAllUsers() =>
