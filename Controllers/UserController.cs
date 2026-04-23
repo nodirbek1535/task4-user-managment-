@@ -109,16 +109,50 @@ namespace task4_user_managment_.Controllers
             {
                 return BadRequest(userValidationException.InnerException);
             }
-            catch(UserDependencyValidationException userDependencyValidationException)
-                when(userDependencyValidationException.InnerException is NotFoundUserException)
+            catch (UserDependencyValidationException userDependencyValidationException)
+                when (userDependencyValidationException.InnerException is NotFoundUserException)
             {
                 return NotFound(userDependencyValidationException.InnerException);
             }
-            catch(UserDependencyException userDependencyException)
+            catch (UserDependencyException userDependencyException)
             {
                 return InternalServerError(userDependencyException.InnerException);
             }
-            catch(UserServiceException userServiceException)
+            catch (UserServiceException userServiceException)
+            {
+                return InternalServerError(userServiceException.InnerException);
+            }
+        }
+
+        [HttpDelete("{userId:guid}")]
+        public async ValueTask<ActionResult<User>> DeleteUserByIdAsync(Guid userId)
+        {
+            try
+            {
+                User deletedUser =
+                    await this.userService.RemoveUserByIdAsync(userId);
+
+                return Ok(deletedUser);
+
+            }
+            catch (UserValidationException userValidationException)
+            {
+                return BadRequest(userValidationException.InnerException);
+            }
+            catch (UserDependencyValidationException userDependencyValidationException)
+                when (userDependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return Locked(userDependencyValidationException.InnerException);
+            }
+            catch (UserDependencyValidationException userDependencyValidationException)
+            {
+                return BadRequest(userDependencyValidationException.InnerException);
+            }
+            catch (UserDependencyException userDependencyException)
+            {
+                return InternalServerError(userDependencyException.InnerException);
+            }
+            catch (UserServiceException userServiceException)
             {
                 return InternalServerError(userServiceException.InnerException);
             }
