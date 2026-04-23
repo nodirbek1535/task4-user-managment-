@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosClient = axios.create({
-  baseURL: 'https://localhost:7186/api', // Change this in production
+  baseURL: 'https://nasrullayevnodirbek-cxg2ehbhcte9a7a4.canadacentral-01.azurewebsites.net/api', // Change this in production
   headers: {
     'Content-Type': 'application/json',
   },
