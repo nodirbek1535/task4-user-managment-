@@ -1,8 +1,7 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using task4_user_managment_.Brokers.Emails;
 using task4_user_managment_.Models.Requests.Auth;
 using task4_user_managment_.Models.Responses;
 using task4_user_managment_.Services.Foundations.Emails;
@@ -20,7 +19,7 @@ namespace task4_user_managment_.Services.Orchestrations.Auth
         private readonly ITokenService tokenService;
 
         public AuthService(
-            IUserService userService, 
+            IUserService userService,
             IPasswordHashService passwordHashService,
             IEmailService emailService,
             ITokenService tokenService)
@@ -42,55 +41,71 @@ namespace task4_user_managment_.Services.Orchestrations.Auth
 
             var createdUser = await this.userService.AddUserAsync(user);
 
-            await this.emailService.SendVerificationEmailAsync(
-                createdUser.Email, 
-                createdUser.Name,
-                createdUser.EmailConfirmationToken!);
+            // Fire-and-forget: email async jo'natiladi, foydalanuvchi kutmaydi
+            _ = Task.Run(async () =>
+            {
+                try
+                {
+                    await this.emailService.SendVerificationEmailAsync(
+                        createdUser.Email!,
+                        createdUser.Name!,
+                        createdUser.EmailConfirmationToken!);
+                }
+                catch { /* Email xatosi butun registratsiyani to'xtata olmaydi */ }
+            });
+
             return new UserResponse
             {
                 Id = createdUser.Id,
-                Name = createdUser.Name,
-                Email = createdUser.Email
+                Name = createdUser.Name!,
+                Email = createdUser.Email!
             };
         }
 
         public async ValueTask<bool> ConfirmEmailAsync(string token)
         {
-            // 1. Token orqali userni topamiz
             var user = await this.userService.RetrieveUserByTokenAsync(token);
 
-            // 2. Token muddati o'tmaganini tekshiramiz
             if (user.TokenExpiresAt < DateTime.UtcNow)
                 return false;
 
-            // 3. Userni faollashtiramiz
-            user.Status = UserStatus.Active;
-            user.EmailConfirmationToken = null; // Tokenni bir martalik qilish uchun o'chiramiz
+            // Faqat Unverified bo'lsa Active qilamiz; Blocked qolsa — Blocked qoladi
+            if (user.Status == UserStatus.Unverified)
+                user.Status = UserStatus.Active;
 
+            user.EmailConfirmationToken = null;
             await this.userService.ModifyUserAsync(user);
 
             return true;
         }
 
-
         public async ValueTask<AuthResponse> LoginAsync(LoginRequest request)
         {
-            // 1. Userni emaili orqali qidiramiz
-            var user = await this.userService.RetrieveUserByEmailAsync(request.Email);
-            // 2. Parolni tekshiramiz
-            bool isPasswordValid = this.passwordHashService.VerifyPassword(request.Password, user.PasswordHash);
-            if (!isPasswordValid) throw new Exception("Parol noto'g'ri!");
-            // 3. Statusni tekshiramiz (Faqat Active userlar kira oladi)
-            if (user.Status != UserStatus.Active)
-                throw new Exception("Akkauntingiz faollashtirilmagan yoki blocklangan!");
+            // 1. Email bo'yicha qidirish
+            var user = await this.userService.RetrieveUserByEmailAsync(request.Email!);
+
+            // 2. Parolni tekshirish
+            bool isPasswordValid =
+                this.passwordHashService.VerifyPassword(request.Password!, user.PasswordHash!);
+
+            if (!isPasswordValid)
+                throw new Exception("Parol noto'g'ri!");
+
+            // 3. Faqat Blocked kirololmaydi (Unverified ham kira oladi — task talabi!)
+            if (user.Status == UserStatus.Blocked)
+                throw new Exception("Akkauntingiz bloklangan. Iltimos, administrator bilan bog'laning.");
+
             // 4. LastLoginTime yangilaymiz
             user.LastLoginTime = DateTime.UtcNow;
             await this.userService.ModifyUserAsync(user);
-            // 5. Token generatsiya qilamiz
-            string token = this.tokenService.GenerateJwtToken(user);
+
+            // 5. JWT token generatsiya
+            string jwtToken = this.tokenService.GenerateJwtToken(user);
+
             return new AuthResponse
             {
-                Token = token,
+                Token = jwtToken,
+                ExpireAt = DateTime.UtcNow.AddMinutes(1440),
                 User = new UserResponse
                 {
                     Id = user.Id,

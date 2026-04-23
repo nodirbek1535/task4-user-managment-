@@ -11,13 +11,24 @@ using task4_user_managment_.Services.Foundations.Emails;
 using task4_user_managment_.Services.Foundations.Security;
 using task4_user_managment_.Services.Foundations.Users;
 using task4_user_managment_.Services.Orchestrations.Auth;
+using task4_user_managment_.Services.Processings.Users;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
 // Brokers
 builder.Services.AddTransient<ILoggingBroker, LoggingBroker>();
 builder.Services.AddTransient<IEmailBroker, EmailBroker>();
-
 builder.Services.AddScoped<IRandomBroker, RandomBroker>();
 builder.Services.AddScoped<IHashBroker, HashBroker>();
 
@@ -27,6 +38,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IUserProcessingService, UserProcessingService>();
 
 // Database
 builder.Services.AddDbContext<StorageBroker>(options =>
@@ -35,7 +47,7 @@ builder.Services.AddDbContext<StorageBroker>(options =>
 
 builder.Services.AddScoped<IStorageBroker, StorageBroker>();
 
-
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -55,13 +67,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Controllers
 builder.Services.AddControllers();
 
-// Swagger ✅
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger middleware ✅
+// Swagger middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -69,6 +81,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<UserStatusCheckMiddleware>();
