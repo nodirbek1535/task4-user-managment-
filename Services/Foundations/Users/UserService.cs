@@ -1,8 +1,8 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using Microsoft.Data.SqlClient;
+
 using task4_user_managment_.Brokers.Loggings;
 using task4_user_managment_.Brokers.Storages;
 using task4_user_managment_.Models.Exceptions;
@@ -70,19 +70,12 @@ namespace task4_user_managment_.Services.Foundations.Users
             {
                 return this.storageBroker.SelectAllUsers();
             }
-            catch(SqlException sqlException)
-            {
-                var failedUserStorageException =
-                    new FailedUserStorageException(sqlException);
-
-                this.loggingBroker.LogError(sqlException);
-
-                throw new UserDependencyException(failedUserStorageException);
-            }
-            catch(Exception ex)
+            catch (Exception exception)
             {
                 var failedUserServiceException =
-                    new FailedUserServiceException(ex);
+                    new FailedUserServiceException(exception);
+
+                this.loggingBroker.LogError(failedUserServiceException);
 
                 throw new UserServiceException(failedUserServiceException);
             }
@@ -93,14 +86,14 @@ namespace task4_user_managment_.Services.Foundations.Users
             {
                 ValidateUserOnModify(user);
 
-                User maybeUser = 
+                User maybeUser =
                     await this.storageBroker.SelectUserByIdAsync(user.Id);
 
                 ValidateUserStorage(maybeUser, user.Id);
                 user.UpdatedDate = DateTime.UtcNow;
 
                 return await this.storageBroker.UpdateUserAsync(user);
-             });
+            });
 
         public ValueTask<User> RemoveUserByIdAsync(Guid userId) =>
             TryCatch(async () =>
@@ -123,6 +116,20 @@ namespace task4_user_managment_.Services.Foundations.Users
 
                 ValidateUserStorage(maybeUser, Guid.Empty);
 
+                return maybeUser!;
+            });
+
+        public ValueTask<User> RetrieveUserByEmailAsync(string email) =>
+            TryCatch(async () =>
+            {
+                // 1. Email bo'sh emasligini tekshirish
+                if (string.IsNullOrWhiteSpace(email))
+                    throw new InvalidUserException();
+                // 2. Bazadan qidirish
+                User maybeUser = await this.storageBroker.SelectUserByEmailAsync(email);
+
+                // 3. Agar topilmasa, xato qaytarish
+                ValidateUserStorage(maybeUser, Guid.Empty);
                 return maybeUser!;
             });
     }

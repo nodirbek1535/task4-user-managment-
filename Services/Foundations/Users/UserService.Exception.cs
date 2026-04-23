@@ -1,10 +1,9 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using EFxceptions.Models.Exceptions;
-using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using task4_user_managment_.Models.Exceptions;
 using UserManagement.Core.Models.Users;
 using Xeptions;
@@ -33,13 +32,6 @@ namespace task4_user_managment_.Services.Foundations.Users
             {
                 throw CreateAndLogValidationException(notFoundUserException);
             }
-            catch (SqlException sqlException)
-            {
-                var failedUserStorageException =
-                    new FailedUserStorageException(sqlException);
-
-                throw CreateAndLogCriticalDependencyException(failedUserStorageException);
-            }
             catch (DbUpdateConcurrencyException dbUpdateConcurrencyException)
             {
                 var lockedUserException =
@@ -48,18 +40,20 @@ namespace task4_user_managment_.Services.Foundations.Users
                 throw CreateAndLogDependencyValidationException(lockedUserException);
             }
             catch (DbUpdateException dbUpdateException)
+                when (dbUpdateException.InnerException is PostgresException pgEx
+                    && pgEx.SqlState == "23505") // Unique constraint violation
+            {
+                var alreadyExistsUserException =
+                    new AlreadyExistsUserException(dbUpdateException);
+
+                throw CreateAndLogDependencyValidationException(alreadyExistsUserException);
+            }
+            catch (DbUpdateException dbUpdateException)
             {
                 var failedUserStorageException =
                     new FailedUserStorageException(dbUpdateException);
 
                 throw CreateAndLogDependencyException(failedUserStorageException);
-            }
-            catch (DuplicateKeyException duplicateKeyException)
-            {
-                var alreadyExistsUserException =
-                    new AlreadyExistsUserException(duplicateKeyException);
-
-                throw CreateAndLogDependencyValidationException(alreadyExistsUserException);
             }
             catch (Exception exception)
             {

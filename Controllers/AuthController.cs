@@ -1,9 +1,10 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
 using Microsoft.AspNetCore.Mvc;
 using RESTFulSense.Controllers;
+using task4_user_managment_.Models.Exceptions;
 using task4_user_managment_.Models.Requests.Auth;
 using task4_user_managment_.Models.Responses;
 using task4_user_managment_.Services.Orchestrations.Auth;
@@ -19,38 +20,88 @@ namespace task4_user_managment_.Controllers
         public AuthController(IAuthService authService) =>
             this.authService = authService;
 
-        //register new user
         [HttpPost("register")]
         public async ValueTask<IActionResult> RegisterAsync(RegisterRequest request)
         {
-            UserResponse response =
-                await this.authService.RegisterAsync(request);
-
-            return Ok(response);
+            try
+            {
+                UserResponse response = await this.authService.RegisterAsync(request);
+                return Ok(response);
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyValidationException dependencyValidationException)
+                when (dependencyValidationException.InnerException is AlreadyExistsUserException)
+            {
+                return Conflict(dependencyValidationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
         }
 
         [HttpGet("confirm-email")]
-        public async ValueTask<ActionResult<string>> ConfirmEmailAsync([FromQuery] string token)
+        public async ValueTask<IActionResult> ConfirmEmailAsync([FromQuery] string token)
         {
-            bool isConfirmed = await this.authService.ConfirmEmailAsync(token);
-
-            if (isConfirmed)
+            try
             {
-                return Ok("Emailingiz muvaffaqiyatli tasdiqlandi! Endi login qilishingiz mumkin.");
-            }
+                bool isConfirmed = await this.authService.ConfirmEmailAsync(token);
 
-            return BadRequest("Token yaroqsiz yoki muddati o'tgan.");
+                if (isConfirmed)
+                    return Ok("Emailingiz muvaffaqiyatli tasdiqlandi! Endi login qilishingiz mumkin.");
+
+                return BadRequest("Token yaroqsiz yoki muddati o'tgan.");
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyValidationException dependencyValidationException)
+            {
+                return BadRequest(dependencyValidationException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
         }
 
-
-        //login user
         [HttpPost("login")]
         public async ValueTask<IActionResult> LoginAsync(LoginRequest request)
         {
-            AuthResponse response =
-                await this.authService.LoginAsync(request);
-
-            return Ok(response);
+            try
+            {
+                AuthResponse response = await this.authService.LoginAsync(request);
+                return Ok(response);
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyValidationException dependencyValidationException)
+                when (dependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(dependencyValidationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+            catch (Exception exception)
+            {
+                return BadRequest(exception.Message);
+            }
         }
     }
 }

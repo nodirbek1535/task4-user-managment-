@@ -1,4 +1,4 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
@@ -34,7 +34,7 @@ namespace task4_user_managment_.Middlewares
                 {
                     var user = await userService.RetrieveUserByAsync(userId);
 
-                    if (user != null || user.Status == UserStatus.Blocked)
+                    if (user == null || user.Status == UserStatus.Blocked)
                     {
                         context.Response.StatusCode = StatusCodes.Status401Unauthorized;
 
@@ -51,8 +51,9 @@ namespace task4_user_managment_.Middlewares
                     context.Response.StatusCode = StatusCodes.Status401Unauthorized;
                     return;
                 }
-                await next(context);
             }
+
+            await next(context); // Token bo'lsa ham, bo'lmasa ham keyinga o'tadi
         }
     }
 }

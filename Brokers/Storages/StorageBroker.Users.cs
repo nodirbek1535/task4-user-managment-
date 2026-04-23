@@ -1,4 +1,4 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
@@ -21,9 +21,9 @@ namespace task4_user_managment_.Brokers.Storages
         }
 
         public async ValueTask<User> SelectUserByIdAsync(Guid userId) =>
-            await this.Users.
-                AsNoTracking().
-                FirstOrDefaultAsync(user => user.Id == userId);
+            await this.Users
+                .AsNoTracking()
+                .FirstOrDefaultAsync(user => user.Id == userId) ?? null!;
 
         public IQueryable<User> SelectAllUsers() =>
             SelectAll<User>();
@@ -50,6 +50,9 @@ namespace task4_user_managment_.Brokers.Storages
 
         public async ValueTask<User> SelectUserByTokenAsync(string token) =>
             await this.Users.FirstOrDefaultAsync(
-                user => user.EmailConfirmationToken == token);
+                user => user.EmailConfirmationToken == token) ?? null!;
+
+        public async ValueTask<User> SelectUserByEmailAsync(string email) =>
+            await this.Users.AsNoTracking().FirstOrDefaultAsync(u => u.Email == email) ?? null!;
     }
 }
