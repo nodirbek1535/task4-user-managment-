@@ -12,5 +12,6 @@ namespace task4_user_managment_.Services.Foundations.Users
         ValueTask<User> RetrieveUserByAsync(Guid userId);
         IQueryable<User> GetAllUsers();
         ValueTask<User> ModifyUserAsync(User user);
+        ValueTask<User> RemoveUserByIdAsync(Guid userId);
     }
 }
