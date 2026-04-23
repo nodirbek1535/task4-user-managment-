@@ -14,5 +14,6 @@ namespace task4_user_managment_.Services.Foundations.Users
         ValueTask<User> ModifyUserAsync(User user);
         ValueTask<User> RemoveUserByIdAsync(Guid userId);
         ValueTask<User> RetrieveUserByTokenAsync(string token);
+        ValueTask<User> RetrieveUserByEmailAsync(string email);
     }
 }

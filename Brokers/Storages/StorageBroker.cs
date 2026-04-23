@@ -1,15 +1,14 @@
-﻿//==============================================================
+//==============================================================
 //Nasrullayev Nodirbek's UserManagment project
 //==============================================================
 
-using EFxceptions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Brokers.Storages
 {
-    public partial class StorageBroker : EFxceptionsContext, IStorageBroker
+    public partial class StorageBroker : DbContext, IStorageBroker
     {
         private readonly IConfiguration configuration;
 

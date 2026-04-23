@@ -1,8 +1,12 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using task4_user_managment_.Brokers.Emails;
 using task4_user_managment_.Brokers.Loggings;
 using task4_user_managment_.Brokers.Security;
 using task4_user_managment_.Brokers.Storages;
+using task4_user_managment_.Middlewares;
 using task4_user_managment_.Services.Foundations.Emails;
 using task4_user_managment_.Services.Foundations.Security;
 using task4_user_managment_.Services.Foundations.Users;
@@ -31,6 +35,23 @@ builder.Services.AddDbContext<StorageBroker>(options =>
 
 builder.Services.AddScoped<IStorageBroker, StorageBroker>();
 
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["JwtSettings:Issuer"],
+            ValidAudience = builder.Configuration["JwtSettings:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!))
+        };
+    });
+
 // Controllers
 builder.Services.AddControllers();
 
@@ -48,7 +69,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
+app.UseMiddleware<UserStatusCheckMiddleware>();
 
 app.MapControllers();
 
