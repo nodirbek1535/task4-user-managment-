@@ -37,5 +37,15 @@ namespace task4_user_managment_.Brokers.Storages
 
             return userEntityEntry.Entity;
         }
+
+        public async ValueTask<User> DeleteUserAsync(User user)
+        {
+            EntityEntry<User> userEntityEntry =
+                this.Users.Remove(user);
+
+            await this.SaveChangesAsync();
+
+            return user;
+        }
     }
 }
