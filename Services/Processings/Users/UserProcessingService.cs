@@ -29,7 +29,10 @@ namespace task4_user_managment_.Services.Processings.Users
             foreach (Guid userId in userIds)
             {
                 User user = await this.userService.RetrieveUserByAsync(userId);
-                user.Status = UserStatus.Active;
+                // Unverified → Unverified qoladi, Blocked → Active bo'ladi
+                if (user.Status == UserStatus.Blocked)
+                    user.Status = UserStatus.Active;
+
                 await this.userService.ModifyUserAsync(user);
             }
         }
@@ -37,9 +40,22 @@ namespace task4_user_managment_.Services.Processings.Users
         public async ValueTask DeleteUsersAsync(List<Guid> userIds)
         {
             foreach (Guid userId in userIds)
-            {
                 await this.userService.RemoveUserByIdAsync(userId);
+        }
+
+        public async ValueTask DeleteUnverifiedUsersAsync(List<Guid> userIds)
+        {
+            foreach (Guid userId in userIds)
+            {
+                User user = await this.userService.RetrieveUserByAsync(userId);
+
+                if (user.Status == UserStatus.Unverified)
+                    await this.userService.RemoveUserByIdAsync(userId);
             }
         }
+
+        public IQueryable<User> GetAllUsersSorted() =>
+            this.userService.GetAllUsers()
+                .OrderByDescending(u => u.LastLoginTime);
     }
 }

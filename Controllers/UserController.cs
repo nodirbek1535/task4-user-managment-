@@ -90,7 +90,7 @@ namespace task4_user_managment_.Controllers
             try
             {
                 IQueryable<User> allUsers =
-                    this.userService.GetAllUsers();
+                    this.userProcessingService.GetAllUsersSorted();
 
                 return Ok(allUsers);
             }
@@ -217,6 +217,28 @@ namespace task4_user_managment_.Controllers
             {
                 await this.userProcessingService.DeleteUsersAsync(userIds);
                 return Ok("Users deleted successfully.");
+            }
+            catch (UserValidationException validationException)
+            {
+                return BadRequest(validationException.InnerException);
+            }
+            catch (UserDependencyException dependencyException)
+            {
+                return InternalServerError(dependencyException.InnerException);
+            }
+            catch (UserServiceException serviceException)
+            {
+                return InternalServerError(serviceException.InnerException);
+            }
+        }
+
+        [HttpDelete("unverified")]
+        public async ValueTask<IActionResult> DeleteUnverifiedUsersAsync([FromBody] List<Guid> userIds)
+        {
+            try
+            {
+                await this.userProcessingService.DeleteUnverifiedUsersAsync(userIds);
+                return Ok("Unverified users deleted successfully.");
             }
             catch (UserValidationException validationException)
             {

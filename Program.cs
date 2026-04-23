@@ -15,10 +15,25 @@ using task4_user_managment_.Services.Processings.Users;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// CORS — React frontend uchun
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(
+            "http://localhost:5173",
+            "http://localhost:3000",
+            "https://localhost:5173"
+        )
+        .AllowAnyHeader()
+        .AllowAnyMethod()
+        .AllowCredentials();
+    });
+});
+
 // Brokers
 builder.Services.AddTransient<ILoggingBroker, LoggingBroker>();
 builder.Services.AddTransient<IEmailBroker, EmailBroker>();
-
 builder.Services.AddScoped<IRandomBroker, RandomBroker>();
 builder.Services.AddScoped<IHashBroker, HashBroker>();
 
@@ -37,7 +52,7 @@ builder.Services.AddDbContext<StorageBroker>(options =>
 
 builder.Services.AddScoped<IStorageBroker, StorageBroker>();
 
-
+// JWT Authentication
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
@@ -57,13 +72,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 // Controllers
 builder.Services.AddControllers();
 
-// Swagger ✅
+// Swagger
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
-// Swagger middleware ✅
+// Swagger middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -71,6 +86,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 app.UseMiddleware<UserStatusCheckMiddleware>();
