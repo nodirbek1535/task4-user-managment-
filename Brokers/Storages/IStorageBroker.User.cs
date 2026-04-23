@@ -12,6 +12,6 @@ namespace task4_user_managment_.Brokers.Storages
         ValueTask<User> SelectUserByIdAsync(Guid userId);   
         IQueryable<User> SelectAllUsers();
         ValueTask<User> UpdateUserAsync(User user);
-        ValueTask<User> DeleteUserAsync(Guid userId);
+        ValueTask<User> DeleteUserAsync(User user);
     }
 }
