@@ -114,5 +114,16 @@ namespace task4_user_managment_.Services.Foundations.Users
 
                 return await this.storageBroker.DeleteUserAsync(maybeUser);
             });
+
+        public ValueTask<User> RetrieveUserByToken(string token) =>
+            TryCatch(async () =>
+            {
+                User maybeUser =
+                    await this.storageBroker.SelectUserByTokenAsync(token);
+
+                ValidateUserStorage(maybeUser, Guid.Empty);
+
+                return maybeUser!;
+            });
     }
 }
