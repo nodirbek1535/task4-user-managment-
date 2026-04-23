@@ -3,6 +3,7 @@ using task4_user_managment_.Brokers.Emails;
 using task4_user_managment_.Brokers.Loggings;
 using task4_user_managment_.Brokers.Security;
 using task4_user_managment_.Brokers.Storages;
+using task4_user_managment_.Middlewares;
 using task4_user_managment_.Services.Foundations.Emails;
 using task4_user_managment_.Services.Foundations.Security;
 using task4_user_managment_.Services.Foundations.Users;
@@ -49,6 +50,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseAuthorization();
+app.UseMiddleware<UserStatusCheckMiddleware>();
 
 app.MapControllers();
 
