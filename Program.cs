@@ -88,4 +88,12 @@ app.UseMiddleware<UserStatusCheckMiddleware>();
 
 app.MapControllers();
 
+// Avtomatik migratsiya (Azure uchun)
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<StorageBroker>();
+    context.Database.Migrate();
+}
+
 app.Run();
