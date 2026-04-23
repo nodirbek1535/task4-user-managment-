@@ -1,107 +1,74 @@
-# User Management API
+# User Management System / Foydalanuvchi Boshqaruv Tizimi
 
-[![.NET](https://img.shields.io/badge/.NET-10.0-512BD4?logo=dotnet)](https://dotnet.microsoft.com/)
-[![Database](https://img.shields.io/badge/database-PostgreSQL-336791?logo=postgresql&logoColor=white)](#tech-stack)
-[![Frontend](https://img.shields.io/badge/frontend-React%2019-61DAFB?logo=react&logoColor=black)](#tech-stack)
-[![Build](https://img.shields.io/badge/build-local-9cf)](#quick-start)
+## English
 
-A clean, production-oriented full-stack user management system with email verification, JWT auth, and admin bulk user operations.
+A full-stack **User Management** application with email verification, JWT authentication, admin-style user operations (block/unblock/delete), and a modern React dashboard.
 
-## 🌐 Language
-- 🇬🇧 **English** (current)
-- 🇺🇿 **Uzbek** → [README.uz.md](README.uz.md)
+### Key Features
+- User registration with email confirmation token.
+- Login with JWT-based authentication.
+- Protected routes and automatic logout on `401`.
+- User listing with bulk actions:
+  - Block users
+  - Unblock users
+  - Delete selected users
+  - Delete unverified users
+- Middleware-based access check for blocked/deleted accounts.
+- PostgreSQL + Entity Framework Core migrations.
 
-## Table of Contents
-- [Overview](#overview)
-- [Features](#features)
-- [Tech Stack](#tech-stack)
-- [Project Architecture](#project-architecture)
-- [Project Structure](#project-structure)
-- [Getting Started](#getting-started)
-- [Quick Start](#quick-start)
-- [Documentation](#documentation)
-- [Contributing](#contributing)
+### Tech Stack & Versions
 
-## Overview
-This project provides a complete user lifecycle:
-- Registration with email confirmation token
-- Email confirmation by token link
-- JWT login/authentication
-- User listing and bulk operations (block/unblock/delete)
-- Middleware guard for blocked/deleted accounts
-
-## Features
-- Authentication endpoints (`register`, `confirm-email`, `login`)
-- CRUD and bulk user operations
-- PostgreSQL persistence with EF Core migrations
-- Structured exception mapping in controllers
-- Swagger/OpenAPI enabled in development
-- React admin UI with protected routes and toast feedback
-
-## Tech Stack
-### Backend
-- .NET `net10.0`
+#### Backend (.NET)
+- .NET SDK / Target Framework: **.NET 10 (`net10.0`)**
 - ASP.NET Core Web API
-- Entity Framework Core `10.0.6`
-- Npgsql EF Core Provider `10.0.1`
-- JWT Bearer `10.0.7`
-- MailKit `4.16.0`
-- BCrypt.Net-Next `4.1.0`
-- RESTFulSense `3.2.0`
-- Xeption `2.8.0`
+- Entity Framework Core **10.0.6**
+- Npgsql EF Core Provider **10.0.1**
+- JWT Bearer Auth **10.0.7**
+- Swagger (Swashbuckle) **10.1.7**
+- MailKit **4.16.0**
+- BCrypt.Net-Next **4.1.0**
+- RESTFulSense **3.2.0**
+- Xeption **2.8.0**
 
-### Frontend
-- React `19.2.5`
-- React Router DOM `7.14.2`
-- Vite `8.0.10`
-- Axios `1.15.2`
-- Bootstrap `5.3.8`
-- React Toastify `11.1.0`
+#### Frontend (React)
+- React **19.2.5**
+- React DOM **19.2.5**
+- React Router DOM **7.14.2**
+- Vite **8.0.10**
+- Axios **1.15.2**
+- Bootstrap **5.3.8**
+- Bootstrap Icons **1.13.1**
+- React Toastify **11.1.0**
+- date-fns **4.1.0**
+- ESLint **10.2.1**
 
-## Project Architecture
-Layered structure:
-- **Controllers**: HTTP boundary + status mapping
-- **Services (Foundations/Processings/Orchestrations)**: business logic
-- **Brokers**: infrastructure abstractions (storage/email/hash/random/logging)
-- **Middlewares**: request pipeline checks
-- **Models**: entities, DTOs, exceptions
-
-For deeper details, see [docs/architecture.md](docs/architecture.md).
-
-## Project Structure
+### Project Structure
 ```text
 .
-├── README.md
-├── README.uz.md
-├── docs/
-│   ├── architecture.md
-│   ├── api.md
-│   ├── diagrams.md
-│   ├── testing.md
-│   ├── deployment.md
-│   └── troubleshooting.md
-├── Controllers/
+├── Brokers/              # External concerns (email, logging, hashing, random, storage)
+├── Controllers/          # API endpoints
+├── Middlewares/          # User status verification middleware
+├── Models/               # Entities, requests, responses, custom exceptions
 ├── Services/
-├── Brokers/
-├── Models/
-├── Migrations/
-└── frontend/
+│   ├── Foundations/      # Core services (users, security, email)
+│   ├── Processings/      # Business workflows for bulk user operations
+│   └── Orchestrations/   # Auth orchestration
+├── Migrations/           # EF Core migrations
+└── frontend/             # React + Vite client app
 ```
 
-## Getting Started
-1. Clone repository
-2. Create backend `appsettings.json`
-3. Run backend
-4. Run frontend
-5. Open Swagger and UI
+### Quick Start
 
-## Quick Start
+#### 1) Clone
 ```bash
-git clone <REPO_URL>
+git clone <your-repo-url>
 cd task4-user-managment-
+```
 
-# Backend
-cat > appsettings.json <<'JSON'
+#### 2) Configure backend settings
+Create `appsettings.json` in the backend root:
+
+```json
 {
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Port=5432;Database=usermanagementdb;Username=postgres;Password=your_password"
@@ -115,33 +82,134 @@ cat > appsettings.json <<'JSON'
   "EmailSettings": {
     "From": "your-email@gmail.com",
     "AppPassword": "your-gmail-app-password"
-  }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
 }
-JSON
+```
 
-# Start API
-# (If .NET SDK is installed)
+#### 3) Run backend
+```bash
 dotnet restore
 dotnet run
+```
 
-# Frontend
+#### 4) Run frontend
+```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Swagger: `https://localhost:<port>/swagger`
+### API Summary
 
-## Documentation
-- Architecture → [docs/architecture.md](docs/architecture.md)
-- API documentation → [docs/api.md](docs/api.md)
-- Diagrams → [docs/diagrams.md](docs/diagrams.md)
-- Testing guide → [docs/testing.md](docs/testing.md)
-- Deployment guide → [docs/deployment.md](docs/deployment.md)
-- Troubleshooting → [docs/troubleshooting.md](docs/troubleshooting.md)
+#### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/confirm-email?token=...`
 
-## Contributing
-1. Create a feature branch (`feature/<name>`)
-2. Keep PRs small and focused
-3. Update docs when behavior changes
-4. Add or update tests where possible
+#### User
+- `GET /api/user`
+- `GET /api/user/{userId}`
+- `POST /api/user`
+- `PUT /api/user`
+- `DELETE /api/user/{userId}`
+- `PATCH /api/user/block`
+- `PATCH /api/user/unblock`
+- `DELETE /api/user/bulk`
+- `DELETE /api/user/unverified`
+
+For complete API schemas, architecture notes, deployment guidance, and troubleshooting, see **[docs/PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md)**.
+
+---
+
+## O'zbekcha
+
+Email tasdiqlash, JWT autentifikatsiya, admin panel uslubidagi foydalanuvchi amallari (bloklash/blokdan chiqarish/o‘chirish) va React interfeysiga ega to‘liq **Foydalanuvchi Boshqaruv** tizimi.
+
+### Asosiy imkoniyatlar
+- Email tasdiqlash tokeni bilan ro‘yxatdan o‘tish.
+- JWT orqali tizimga kirish.
+- Himoyalangan sahifalar va `401` holatda avtomatik chiqish.
+- Foydalanuvchilar ro‘yxati va ommaviy amallar:
+  - Foydalanuvchilarni bloklash
+  - Blokdan chiqarish
+  - Tanlanganlarni o‘chirish
+  - Tasdiqlanmaganlarni o‘chirish
+- Bloklangan/o‘chirilgan akkauntlarni middleware orqali tekshirish.
+- PostgreSQL + Entity Framework Core migratsiyalar.
+
+### Texnologiyalar va versiyalar
+
+#### Backend (.NET)
+- .NET SDK / Target Framework: **.NET 10 (`net10.0`)**
+- ASP.NET Core Web API
+- Entity Framework Core **10.0.6**
+- Npgsql EF Core Provider **10.0.1**
+- JWT Bearer Auth **10.0.7**
+- Swagger (Swashbuckle) **10.1.7**
+- MailKit **4.16.0**
+- BCrypt.Net-Next **4.1.0**
+- RESTFulSense **3.2.0**
+- Xeption **2.8.0**
+
+#### Frontend (React)
+- React **19.2.5**
+- React DOM **19.2.5**
+- React Router DOM **7.14.2**
+- Vite **8.0.10**
+- Axios **1.15.2**
+- Bootstrap **5.3.8**
+- Bootstrap Icons **1.13.1**
+- React Toastify **11.1.0**
+- date-fns **4.1.0**
+- ESLint **10.2.1**
+
+### Loyihani ishga tushirish (tezkor)
+
+#### 1) Clone qiling
+```bash
+git clone <repo-url>
+cd task4-user-managment-
+```
+
+#### 2) Backend sozlamalarini kiriting
+Root papkada `appsettings.json` yarating (yuqoridagi JSON namunadan foydalaning).
+
+#### 3) Backend ishga tushiring
+```bash
+dotnet restore
+dotnet run
+```
+
+#### 4) Frontend ishga tushiring
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### API qisqacha
+
+#### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `GET /api/auth/confirm-email?token=...`
+
+#### User
+- `GET /api/user`
+- `GET /api/user/{userId}`
+- `POST /api/user`
+- `PUT /api/user`
+- `DELETE /api/user/{userId}`
+- `PATCH /api/user/block`
+- `PATCH /api/user/unblock`
+- `DELETE /api/user/bulk`
+- `DELETE /api/user/unverified`
+
+To‘liq hujjatlar (arxitektura, API request/response misollari, deployment va troubleshooting) bu yerda: **[docs/PROJECT_DOCUMENTATION.md](docs/PROJECT_DOCUMENTATION.md)**.
