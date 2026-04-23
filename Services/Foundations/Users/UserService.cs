@@ -40,11 +40,13 @@ namespace task4_user_managment_.Services.Foundations.Users
                 user.PasswordHash =
                     this.passwordHashService.HashPassword(user.PasswordHash);
 
+                user.EmailConfirmationToken =
+                    this.tokenService.GenerateEmailConfirmationToken();
+
                 user.TokenExpiresAt =
                     this.tokenService.GetTokenExpirationTime();
 
                 user.Status = UserStatus.Unverified;
-
                 user.CreatedDate = DateTime.UtcNow;
                 user.UpdatedDate = DateTime.UtcNow;
                 user.RegistrationTime = DateTime.UtcNow;
