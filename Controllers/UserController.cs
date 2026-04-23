@@ -95,5 +95,33 @@ namespace task4_user_managment_.Controllers
                 return InternalServerError(serviceException.InnerException);
             }
         }
+
+        [HttpPut]
+        public async ValueTask<ActionResult<User>> PutUserAsync(User user)
+        {
+            try
+            {
+                User modifiedUser = await this.userService.ModifyUserAsync(user);
+
+                return Ok(modifiedUser);
+            }
+            catch (UserValidationException userValidationException)
+            {
+                return BadRequest(userValidationException.InnerException);
+            }
+            catch(UserDependencyValidationException userDependencyValidationException)
+                when(userDependencyValidationException.InnerException is NotFoundUserException)
+            {
+                return NotFound(userDependencyValidationException.InnerException);
+            }
+            catch(UserDependencyException userDependencyException)
+            {
+                return InternalServerError(userDependencyException.InnerException);
+            }
+            catch(UserServiceException userServiceException)
+            {
+                return InternalServerError(userServiceException.InnerException);
+            }
+        }
     }
 }

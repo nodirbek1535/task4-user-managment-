@@ -3,6 +3,7 @@
 //==============================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
 using UserManagement.Core.Models.Users;
 
 namespace task4_user_managment_.Brokers.Storages
@@ -21,9 +22,20 @@ namespace task4_user_managment_.Brokers.Storages
 
         public async ValueTask<User> SelectUserByIdAsync(Guid userId) =>
             await this.Users.
+                AsNoTracking().
                 FirstOrDefaultAsync(user => user.Id == userId);
 
         public IQueryable<User> SelectAllUsers() =>
             SelectAll<User>();
+
+        public async ValueTask<User> UpdateUserAsync(User user)
+        {
+            EntityEntry<User> userEntityEntry =
+                this.Users.Update(user);
+
+            await this.SaveChangesAsync();
+
+            return userEntityEntry.Entity;
+        }
     }
 }

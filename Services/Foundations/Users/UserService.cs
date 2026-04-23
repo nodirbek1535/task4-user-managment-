@@ -85,5 +85,19 @@ namespace task4_user_managment_.Services.Foundations.Users
                 throw new UserServiceException(failedUserServiceException);
             }
         }
+
+        public ValueTask<User> ModifyUserAsync(User user) =>
+            TryCatch(async () =>
+            {
+                ValidateUserOnModify(user);
+
+                User maybeUser = 
+                    await this.storageBroker.SelectUserByIdAsync(user.Id);
+
+                ValidateUserStorage(maybeUser, user.Id);
+                user.UpdatedDate = DateTime.UtcNow;
+
+                return await this.storageBroker.UpdateUserAsync(user);
+             });
     }
 }
