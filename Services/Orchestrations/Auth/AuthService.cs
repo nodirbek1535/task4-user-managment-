@@ -51,6 +51,24 @@ namespace task4_user_managment_.Services.Orchestrations.Auth
             };
         }
 
+        public async ValueTask<bool> ConfirmEmailAsync(string token)
+        {
+            // 1. Token orqali userni topamiz
+            var user = await this.userService.RetrieveUserByTokenAsync(token);
+
+            // 2. Token muddati o'tmaganini tekshiramiz
+            if (user.TokenExpiresAt < DateTime.UtcNow)
+                return false;
+
+            // 3. Userni faollashtiramiz
+            user.Status = UserStatus.Active;
+            user.EmailConfirmationToken = null; // Tokenni bir martalik qilish uchun o'chiramiz
+
+            await this.userService.ModifyUserAsync(user);
+
+            return true;
+        }
+
 
         public ValueTask<AuthResponse> LoginAsync(LoginRequest request)
         {

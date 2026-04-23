@@ -13,6 +13,6 @@ namespace task4_user_managment_.Services.Foundations.Users
         IQueryable<User> GetAllUsers();
         ValueTask<User> ModifyUserAsync(User user);
         ValueTask<User> RemoveUserByIdAsync(Guid userId);
-        ValueTask<User> RetrieveUserByToken(string token);
+        ValueTask<User> RetrieveUserByTokenAsync(string token);
     }
 }
